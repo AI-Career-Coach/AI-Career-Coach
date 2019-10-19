@@ -1,9 +1,17 @@
 import React from 'react';
-
+//import 'bootstrap/dist/css/bootstrap.css';
+import NavigationMenu from './header';
 const Main = () => {
   return (
-    <div className="container">
-      <h1>Page contents here</h1>
+    <div>
+
+      <NavigationMenu/>
+      <div className="col-10 col-md-8 col-lg-7">
+
+      </div>
+      <div className="fb-customerchat"
+        page_id="107313274024760">
+      </div>
     </div>
   );
 };
