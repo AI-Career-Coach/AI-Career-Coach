@@ -1,31 +1,43 @@
 {
-  "name": "ai-career-coach",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "react": "^16.10.2",
-    "react-dom": "^16.10.2",
-    "react-scripts": "3.2.0"
-  },
+  "name": "stock-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test": "test",
+    "start": "webpack -w & nodemon server",
+    "build": "webpack",
+    "build-watch": "webpack -w",
+    "start-dev": "webpack -w & nodemon server"
   },
-  "eslintConfig": {
-    "extends": "react-app"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tjhelsel/Stock-tracker.git"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "author": "Terence Helsel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tjhelsel/Stock-tracker/issues"
+  },
+  "homepage": "https://github.com/tjhelsel/Stock-tracker#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "react": "^16.10.1",
+    "react-dom": "^16.10.1",
+    "react-redux": "^7.1.1",
+    "redux": "^4.0.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.2",
+    "@babel/preset-env": "^7.6.2",
+    "@babel/preset-react": "^7.0.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.0.6",
+    "babel-preset-es2015": "^6.24.1",
+    "morgan": "^1.9.1",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.3.0",
+    "webpack": "^4.41.0",
+    "webpack-cli": "^3.3.9"
   }
 }
