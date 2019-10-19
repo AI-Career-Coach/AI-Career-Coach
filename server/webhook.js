@@ -63,6 +63,7 @@ function handleMessage(sender_psid, received_message) {
   let justAskedGithubUsername = true;
   let message_payload;
   // Check if the message contains text
+  console.log(received_message);
   if (received_message.text) {
     if (received_message.text === 'quiz') {
       message_payload = offerQuiz();
@@ -75,12 +76,22 @@ function handleMessage(sender_psid, received_message) {
           type: 'template',
           payload: {
             template_type: 'button',
-            text: 'What do you want to do next?',
+            text: 'What language do you primarily use?',
             buttons: [
               {
-                type: 'web_url',
-                url: 'https://www.messenger.com',
-                title: 'Visit Messenger'
+                type: 'postback',
+                title: 'Javascript',
+                payload: 'JavaScript'
+              },
+              {
+                type: 'postback',
+                title: 'Ruby',
+                payload: 'Ruby'
+              },
+              {
+                type: 'postback',
+                title: 'Python',
+                payload: 'Python'
               }
             ]
           }
@@ -88,13 +99,20 @@ function handleMessage(sender_psid, received_message) {
       };
     }
   }
+  // else if(received_message.messaging_postbacks){
+  //   console.log("postback")
+  // }
   // Sends the response message
   callSendAPI(sender_psid, message_payload);
 }
 
 // Handles messaging_postbacks events
 function handlePostback(sender_psid, received_postback) {
-  callSendAPI(sender_psid, sendQuiz(received_postback.payload));
+  if (received_postback.payload.postback == 'yes' || 'no') {
+    callSendAPI(sender_psid, sendQuiz(received_postback.payload.toString()));
+  } else {
+    callSendAPI(sender_psid, offerQuiz(received_postback.payload.toString()));
+  }
 }
 
 // Sends response messages via the Send API
@@ -111,7 +129,7 @@ function callSendAPI(sender_psid, message_body) {
   request(
     {
       uri: 'https://graph.facebook.com/v2.6/me/messages',
-      qs: { access_token: PAGE_ACCESS_TOKEN },
+      qs: { access_token: process.env.PAGE_ACCESS_TOKEN },
       method: 'POST',
       json: request_body
     },
