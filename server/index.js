@@ -14,6 +14,8 @@ app.use(morgan('dev'));
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
+app.use('/webhook', require('./webhook'));
+
 app.use('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
