@@ -2,6 +2,8 @@
 const router = require('express').Router();
 const request = require('request');
 const { VERIFY_TOKEN, PAGE_ACCESS_TOKEN } = require('../secrets');
+const { offerQuiz, sendQuiz } = require('./language_quizzes');
+const { github_info } = require('./github_api');
 
 // Creates the endpoint for our webhook
 router.post('/', (req, res) => {
@@ -11,10 +13,12 @@ router.post('/', (req, res) => {
   if (body.object === 'page') {
     // Iterates over each entry - there may be multiple if batched
     body.entry.forEach(function(entry) {
-      // Gets the message. entry.messaging is an array, but
-      // will only ever contain one message, so we get index 0
+      // Get the webhook event. entry.messaging is an array, but
+      // will only ever contain one event, so we get index 0
       let webhook_event = entry.messaging[0];
+      // console.log(webhook_event);
       let sender_psid = webhook_event.sender.id;
+
       if (webhook_event.message) {
         handleMessage(sender_psid, webhook_event.message);
       } else if (webhook_event.postback) {
@@ -45,7 +49,6 @@ router.get('/', (req, res) => {
     // Checks the mode and token sent is correct
     if (mode === 'subscribe' && token === VERIFY_TOKEN) {
       // Responds with the challenge token from the request
-      console.log('WEBHOOK_VERIFIED');
       res.status(200).send(challenge);
     } else {
       // Responds with '403 Forbidden' if verify tokens do not match
@@ -57,53 +60,51 @@ router.get('/', (req, res) => {
 // Handles messages events
 function handleMessage(sender_psid, received_message) {
   let response;
-
+  let justAskedGithubUsername = true;
+  let message_payload;
   // Check if the message contains text
   if (received_message.text) {
-    // Create the payload for a basic text message
-    response = {
-      text: `You sent the message: "${received_message.text}".`
-      //The response would be the below if you want to reply with buttons (or other attachments).
-      //If you use the below, you should remove the "text" property from the response object.
-      // "attachment": {
-      //   "type": "template",
-      //   "payload": {
-      //     "template_type": "generic",
-      //     "elements": [{
-      //       "title": "Is this the right message?",
-      //       "subtitle": "Tap a button to answer.",
-      //       "buttons": [
-      //         {
-      //           "type": "postback",
-      //           "title": "Yes!",
-      //           "payload": "yes",
-      //         },
-      //         {
-      //           "type": "postback",
-      //           "title": "No!",
-      //           "payload": "no",
-      //         }
-      //       ]
-      //     }]
-      //   }
-      // }
-    };
+    if (received_message.text === 'quiz') {
+      message_payload = offerQuiz();
+    } else {
+      github_info('tjhelsel');
+      // If input github_username\
+      // Return github_username
+      message_payload = {
+        attachment: {
+          type: 'template',
+          payload: {
+            template_type: 'button',
+            text: 'What do you want to do next?',
+            buttons: [
+              {
+                type: 'web_url',
+                url: 'https://www.messenger.com',
+                title: 'Visit Messenger'
+              }
+            ]
+          }
+        }
+      };
+    }
   }
   // Sends the response message
-  callSendAPI(sender_psid, response);
+  callSendAPI(sender_psid, message_payload);
 }
 
 // Handles messaging_postbacks events
-function handlePostback(sender_psid, received_postback) {}
+function handlePostback(sender_psid, received_postback) {
+  callSendAPI(sender_psid, sendQuiz(received_postback.payload));
+}
 
 // Sends response messages via the Send API
-function callSendAPI(sender_psid, response) {
+function callSendAPI(sender_psid, message_body) {
   // Construct the message body
-  let request_body = {
+  const request_body = {
     recipient: {
       id: sender_psid
     },
-    message: response
+    message: message_body
   };
 
   // Send the HTTP request to the Messenger Platform
@@ -123,5 +124,3 @@ function callSendAPI(sender_psid, response) {
     }
   );
 }
-
-module.exports = router;
